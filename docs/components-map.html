@@ -1,0 +1,269 @@
+<title>Signal Components Map</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: swimlane grid — actors as rows, Trigger → Output as columns; numbered boxes give the run order. Same format as the Freshroots components map. */
+:root {
+  --bg: #f3f5f2; --panel: #ffffff; --lane: #eef1ec; --line: #d7ddd5; --fg: #17201b; --muted: #5d6b62;
+  --accent: #0f8a5f;
+  --human-bg: #fff6e8; --human-bd: #d98a1c; --human-fg: #7a4507;
+  --sys-bg: #f1f4f8; --sys-bd: #8a9aae; --sys-fg: #2b3a4d;
+  --ai-bg: #f3efff; --ai-bd: #7d63d6; --ai-fg: #42308f;
+  --store-bg: #e9f7f0; --store-bd: #2f9e72; --store-fg: #0f5a3d;
+  --out-bg: #eaf4fb; --out-bd: #3d8bc4; --out-fg: #164a70;
+  --font-display: "Instrument Sans", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f1412; --panel: #161d1a; --lane: #1b2420; --line: #2c3833; --fg: #e6ece8; --muted: #9aa9a1; --accent: #3fcf96;
+  --human-bg: #2a1f0f; --human-bd: #d99a3c; --human-fg: #f5cf94;
+  --sys-bg: #1a222c; --sys-bd: #6f829a; --sys-fg: #c9d6e6;
+  --ai-bg: #211b38; --ai-bd: #9a84ee; --ai-fg: #d6cbff;
+  --store-bg: #12271e; --store-bd: #3fb985; --store-fg: #a9e8cb;
+  --out-bg: #11222f; --out-bd: #5aa6dc; --out-fg: #b6dcf6;
+  color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #0f1412; --panel: #161d1a; --lane: #1b2420; --line: #2c3833; --fg: #e6ece8; --muted: #9aa9a1; --accent: #3fcf96;
+  --human-bg: #2a1f0f; --human-bd: #d99a3c; --human-fg: #f5cf94;
+  --sys-bg: #1a222c; --sys-bd: #6f829a; --sys-fg: #c9d6e6;
+  --ai-bg: #211b38; --ai-bd: #9a84ee; --ai-fg: #d6cbff;
+  --store-bg: #12271e; --store-bd: #3fb985; --store-fg: #a9e8cb;
+  --out-bg: #11222f; --out-bd: #5aa6dc; --out-fg: #b6dcf6;
+  color-scheme: dark; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font-display); font-size: 15px; line-height: 1.5; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-block: 32px 48px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 28px; }
+.eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
+h1 { margin: 4px 0 6px; font-size: clamp(26px, 4vw, 38px); line-height: 1.1; letter-spacing: -.02em; text-wrap: balance; }
+h2 { margin: 0 0 10px; font-size: 19px; text-wrap: balance; }
+.lede { margin: 0; max-width: 68ch; color: var(--muted); }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: 13px; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.sw { width: 14px; height: 14px; border-radius: 4px; border: 1.5px solid; }
+.scroll { overflow-x: auto; border-radius: 14px; border: 1px solid var(--line); background: var(--panel); }
+.map { display: grid; grid-template-columns: 168px repeat(6, minmax(132px, 1fr)); min-width: 1000px; }
+.head { padding: 12px 10px; font-weight: 600; font-size: 13px; text-align: center; border-bottom: 1px solid var(--line); background: var(--lane); }
+.head:first-child { text-align: left; color: var(--muted); font-weight: 500; }
+.actor { padding: 12px 14px; border-top: 1px solid var(--line); display: flex; flex-direction: column; justify-content: center; }
+.actor b { font-size: 14px; }
+.actor small { color: var(--muted); font-size: 12px; }
+.cell { border-top: 1px solid var(--line); border-left: 1px dashed var(--line); padding: 10px 8px; display: flex; flex-direction: column; gap: 8px; justify-content: center; min-height: 86px; }
+.human-row { background: color-mix(in srgb, var(--human-bg) 55%, transparent); }
+.human-row.actor { box-shadow: inset 4px 0 0 var(--human-bd); }
+.box { position: relative; border: 1.5px solid; border-radius: 10px; padding: 9px 10px 9px 12px; font-size: 13px; line-height: 1.35; }
+.box .n { position: absolute; top: -9px; left: -7px; min-width: 22px; height: 22px; padding: 0 4px; border-radius: 11px; display: grid; place-items: center; font-family: var(--font-mono); font-size: 11px; background: var(--fg); color: var(--bg); }
+.human { background: var(--human-bg); border-color: var(--human-bd); color: var(--human-fg); }
+.sys { background: var(--sys-bg); border-color: var(--sys-bd); color: var(--sys-fg); }
+.ai { background: var(--ai-bg); border-color: var(--ai-bd); color: var(--ai-fg); }
+.store { background: var(--store-bg); border-color: var(--store-bd); color: var(--store-fg); }
+.out { background: var(--out-bg); border-color: var(--out-bd); color: var(--out-fg); }
+.cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; min-width: 0; }
+ol.flow { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; counter-reset: s; }
+ol.flow li { display: grid; grid-template-columns: 30px 1fr; gap: 10px; font-size: 14px; }
+ol.flow li::before { counter-increment: s; content: counter(s); font-family: var(--font-mono); font-size: 12px; width: 24px; height: 24px; border-radius: 12px; display: grid; place-items: center; background: var(--fg); color: var(--bg); }
+ul.changes { margin: 0; padding-left: 18px; display: grid; gap: 8px; font-size: 14px; }
+ul.changes s { color: var(--muted); }
+.foot { font-size: 13px; color: var(--muted); display: grid; gap: 4px; }
+.foot b { color: var(--fg); font-weight: 600; }
+code { font-family: var(--font-mono); font-size: 12px; }
+details { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px 18px; min-width: 0; }
+summary { cursor: pointer; font-weight: 600; }
+summary:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+details .orig { margin-top: 12px; overflow-x: auto; border-radius: 10px; border: 1px solid var(--line); background: #ffffff; padding: 12px; }
+details .orig pre { margin: 0; }
+a { color: var(--accent); }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">MESA Term 2 · AI Case 2 · Sprinto · Cold outreach, at scale</div>
+    <h1>Components map, as built</h1>
+    <p class="lede">Who and what takes part in each step, from the Growth Lead's list of domains to a personalised email in the inbox. Numbers give the order a run happens in. Amber rows are where a person decides. Rules make every verdict; Gemini only reads pages and writes text.</p>
+  </header>
+
+  <div class="legend" aria-label="Legend">
+    <span><i class="sw human" style="border-color:var(--human-bd)"></i>Growth Lead decides</span>
+    <span><i class="sw sys" style="border-color:var(--sys-bd)"></i>Code, websites and Hunter</span>
+    <span><i class="sw store" style="border-color:var(--store-bd)"></i>Stored in Postgres</span>
+    <span><i class="sw ai" style="border-color:var(--ai-bd)"></i>Gemini (reads and writes, never decides)</span>
+    <span><i class="sw out" style="border-color:var(--out-bd)"></i>Output</span>
+  </div>
+
+  <div class="scroll" role="region" aria-label="Components map grid" tabindex="0">
+    <div class="map">
+      <div class="head">Actor</div><div class="head">Trigger</div><div class="head">Input</div><div class="head">Context</div><div class="head">Processing</div><div class="head">AI</div><div class="head">Output</div>
+
+      <div class="actor human-row"><b>Growth Lead</b><small>Sprinto outbound</small></div>
+      <div class="cell human-row"><div class="box human"><span class="n">1</span>Pastes 1–20 domains, sets signal weights and switches, clicks Run</div></div>
+      <div class="cell human-row"></div><div class="cell human-row"></div><div class="cell human-row"></div><div class="cell human-row"></div><div class="cell human-row"></div>
+
+      <div class="actor"><b>Company websites</b><small>Public pages only</small></div>
+      <div class="cell"></div>
+      <div class="cell"><div class="box sys"><span class="n">3</span>Homepage, then up to 4 more pages. Plain fetch, r.jina.ai reader if thin</div></div>
+      <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+      <div class="actor"><b>Postgres</b><small>Neon on Vercel</small></div>
+      <div class="cell"></div><div class="cell"></div>
+      <div class="cell"><div class="box store"><span class="n">4</span>Weights, switches, rejected domains, Hunter and AI caches, every fetch and quote</div></div>
+      <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+      <div class="actor"><b>Rules engine</b><small>TypeScript, every verdict</small></div>
+      <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+      <div class="cell"><div class="box sys"><span class="n">2</span>Cleans and de-duplicates domains; robots.txt says no → quarantine</div><div class="box sys"><span class="n">9</span>Fit R-01–R-04, signals S-01–S-07, verdict Send / Hold / Drop with the rule that fired</div></div>
+      <div class="cell"></div><div class="cell"></div>
+
+      <div class="actor"><b>Agent loop</b><small>Capped at 4 extra pages</small></div>
+      <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+      <div class="cell"><div class="box sys"><span class="n">6</span>B2B SaaS, size, certification or pressure still empty? Read another page, else stop</div></div>
+      <div class="cell"></div><div class="cell"></div>
+
+      <div class="actor"><b>Gemini</b><small><code>gemini-3.8-flash</code></small></div>
+      <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+      <div class="cell"><div class="box ai"><span class="n">5</span>Reads each page into fields, each with a word-for-word quote</div><div class="box ai"><span class="n">7</span>Suggests which page to read next</div><div class="box ai"><span class="n">11</span>Two pain points, then an email: "Hi &lt;first name&gt;," with a hook from their site</div></div>
+      <div class="cell"></div>
+
+      <div class="actor"><b>Hunter.io</b><small>Free plan, 50 credits / month</small></div>
+      <div class="cell"></div>
+      <div class="cell"><div class="box sys"><span class="n">8</span>Company size, when the site never states it</div><div class="box sys"><span class="n">10</span>Named people at the company, ranked by a ladder for its size</div></div>
+      <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+      <div class="actor"><b>Evidence check</b><small>Code, before anything sends</small></div>
+      <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+      <div class="cell"><div class="box sys"><span class="n">12</span>Every quote must be on a fetched page, or it shows "not stated" and the draft is blocked</div></div>
+      <div class="cell"></div><div class="cell"></div>
+
+      <div class="actor"><b>Resend</b><small>Gmail API also supported</small></div>
+      <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+      <div class="cell"><div class="box out"><span class="n">13</span>auto_send: each checked Send is emailed to the Growth Lead's own inbox, locked in code</div></div>
+
+      <div class="actor human-row"><b>Review</b><small>Growth Lead, on the board</small></div>
+      <div class="cell human-row"></div><div class="cell human-row"></div><div class="cell human-row"></div><div class="cell human-row"></div><div class="cell human-row"></div>
+      <div class="cell human-row"><div class="box human"><span class="n">14</span>Reads why. Accepts, or rejects with a reason so the next run skips that company</div></div>
+    </div>
+  </div>
+
+  <div class="cols">
+    <section class="panel">
+      <h2>One run, step by step</h2>
+      <ol class="flow">
+        <li>The Growth Lead pastes the week's domains and clicks Run. Nothing runs before that.</li>
+        <li>Code cleans every domain, removes duplicates, and quarantines any site whose robots.txt says no.</li>
+        <li>Signal fetches the company's homepage, falling back to a reader service if the page is thin.</li>
+        <li>The run loads the current weights and switches, last runs' rejections, and cached Hunter and AI answers.</li>
+        <li>Gemini reads the page into four facts. Each fact needs a word-for-word quote, or it stays "not stated".</li>
+        <li>If a fact is still missing and fewer than 4 extra pages have been read, the loop goes again. Code makes that call.</li>
+        <li>Gemini suggests the next page, such as /security, /pricing or /careers. Every choice is logged with its reason.</li>
+        <li>If no page states the company's size, Hunter's company data fills it, labelled as Hunter's.</li>
+        <li>The rules engine checks fit, adds up the timing signals and gives Send, Hold or Drop with a rule ID. A SOC 2 claim on any page counts as already certified.</li>
+        <li>For companies that fit, Hunter finds named people and code picks one by role for the company's size.</li>
+        <li>Gemini names two pain points and writes the email to that person by first name, opening on a fact from their site.</li>
+        <li>Code checks every quote against the fetched pages. A draft that fails cannot be sent.</li>
+        <li>With auto_send on, each checked Send goes straight to the Growth Lead's own inbox. The recipient cannot be changed from the app.</li>
+        <li>The Growth Lead reads the reasons, moves weights to re-rank without new fetches, and rejects with a reason what should not come back.</li>
+      </ol>
+    </section>
+    <section class="panel">
+      <h2>What changed from the original map</h2>
+      <ul class="changes">
+        <li>Emails open "Hi &lt;first name&gt;," and end with a Sprinto sign-off, so each one is addressed to a real person by name. <s>Draft with no greeting</s></li>
+        <li>auto_send now sends every checked Send as soon as its draft is written, as the brief asks. <s>Every send needed a click; the auto_send switch did nothing</s></li>
+        <li>A SOC 2 or ISO 27001 claim on any page read marks the company as already certified, so it gets the migration pitch. <s>Certification set by the first page that mentioned security</s></li>
+        <li>When the site never states a headcount, Hunter's company data supplies it, labelled as Hunter's. <s>Size missing at the page cap held almost every company</s></li>
+        <li>Email goes through Resend to the Growth Lead's own inbox. Gmail stays first in line if its keys are added. <s>Gmail API only</s></li>
+      </ul>
+    </section>
+  </div>
+
+  <div class="foot">
+    <div><b>Stack:</b> Next.js on Vercel · TypeScript rules engine · Neon Postgres · Gemini <code>gemini-3.8-flash</code> · Hunter.io Domain Search and Company Enrichment · Resend (Gmail API supported) · r.jina.ai reader fallback</div>
+    <div><b>Needed before real outreach:</b> a paid Hunter plan (a new company can use 2 of the 50 free credits), a verified sending domain on Resend or Gmail keys, and a decision to email prospects directly. Today every email goes only to the Growth Lead's own inbox, as the brief requires.</div>
+    <div><b>Live app:</b> <a href="https://signal-sprinto-gamma.vercel.app" target="_blank" rel="noopener">signal-sprinto-gamma.vercel.app</a> · <b>Code:</b> <a href="https://github.com/Abhi908-Y/signal-sprinto" target="_blank" rel="noopener">github.com/Abhi908-Y/signal-sprinto</a></div>
+  </div>
+
+  <details>
+    <summary>Original components map (before the changes)</summary>
+    <div class="orig">
+<pre class="mermaid">
+flowchart LR
+  subgraph GL["🧑 Growth Lead"]
+    direction TB
+    GL1["Pastes domains&lt;br/&gt;Starts the run"]
+    GL2["Moves S-01…S-07 weights&lt;br/&gt;Flips strict_icp / ai_enabled"]
+    GL3["Reads verdict + evidence&lt;br/&gt;Swaps contact · edits draft"]
+    GL4["Accepts or rejects&lt;br/&gt;with a written reason"]
+    GL5["Clicks Send"]
+  end
+
+  subgraph SYS["⚙️ System — deterministic TypeScript"]
+    direction TB
+    S1["① normalizeDomain&lt;br/&gt;dedupe to one company"]
+    S2["② robots.txt gate&lt;br/&gt;disallow ⇒ quarantine, 0 fetches"]
+    S3["③ fetch tiers&lt;br/&gt;plain GET → r.jina.ai → stop"]
+    S4["④ extract → Evidence Map"]
+    S5{"⑤ shouldContinue?&lt;br/&gt;fields empty AND&lt;br/&gt;fetches_used &amp;lt; 4"}
+    S6["⑥ pick next page&lt;br/&gt;persist loop_trace row"]
+    S7["⑦ rules engine&lt;br/&gt;FIT R-01…R-04&lt;br/&gt;signals S-01…S-07&lt;br/&gt;verdict R-20 / R-21 / R-22"]
+    S8["⑧ R-30 PoC ladder&lt;br/&gt;by headcount band"]
+    S9["⑨ pain points"]
+    S10["⑩ evidence validator&lt;br/&gt;quote on page? ⇒ sendable"]
+  end
+
+  subgraph HUN["🔎 Hunter.io"]
+    H1["Domain Search&lt;br/&gt;named people only"]
+  end
+
+  subgraph GEM["✨ Gemini Flash · gemini-3.8-flash"]
+    direction TB
+    A1["AI-1 read fields out of prose&lt;br/&gt;+ the quote that proves each"]
+    A2["AI-2 suggest the next URL"]
+    A3["AI-3 name 2 pain points"]
+    A4["AI-4 write subject + body"]
+  end
+
+  subgraph GM["📧 Gmail API"]
+    G1["users.messages.send&lt;br/&gt;to: GMAIL_SEND_TO 🔒"]
+  end
+
+  GL1 --&gt; S1 --&gt; S2 --&gt; S3 --&gt; S4
+  S4 -.-&gt;|"text + empty fields"| A1
+  A1 -.-&gt;|"value + verbatim quote"| S4
+  S4 --&gt; S5
+
+  S5 --&gt;|"yes — the one conditional path"| S6
+  S6 -.-&gt;|"candidate links"| A2
+  A2 -.-&gt;|"suggested URL"| S6
+  S6 --&gt;|"loop back, budget −1"| S3
+  S5 --&gt;|"no — complete, or 4/4 spent"| S7
+
+  S7 --&gt; S8
+  S8 --&gt;|"FIT passed only"| H1
+  H1 --&gt;|"candidates"| S8
+  S8 --&gt; S9
+  S9 -.-&gt; A3
+  A3 -.-&gt; S9
+  S9 --&gt; S10
+  S10 -.-&gt; A4
+  A4 -.-&gt;|"draft"| S10
+
+  S7 --&gt; GL3
+  S10 --&gt; GL3
+  GL2 --&gt;|"re-score stored evidence&lt;br/&gt;no fetch, no AI call"| S7
+  GL3 --&gt; GL5
+  GL5 --&gt;|"draftId only — no recipient"| G1
+  GL3 --&gt; GL4
+  GL4 --&gt;|"suppress on next run"| S1
+
+  classDef sys fill:#eef2ff,stroke:#4338ca,color:#1e1b4b
+  classDef ai fill:#fef3c7,stroke:#b45309,color:#451a03
+  classDef lead fill:#ecfdf5,stroke:#047857,color:#022c22
+  classDef ext fill:#fae8ff,stroke:#a21caf,color:#4a044e
+  class S1,S2,S3,S4,S5,S6,S7,S8,S9,S10 sys
+  class A1,A2,A3,A4 ai
+  class GL1,GL2,GL3,GL4,GL5 lead
+  class H1,G1 ext
+</pre>
+    </div>
+  </details>
+</div>

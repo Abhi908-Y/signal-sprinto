@@ -36,6 +36,10 @@ Every page footer names the resolved model id, so the AI claim is checkable from
 
 ## Components Map
 
+The as-built map, a swimlane grid of who does what at each of the 14 steps, is in
+[`docs/components-map.html`](docs/components-map.html). The diagram below is the original design;
+the as-built map lists what changed from it.
+
 ```mermaid
 flowchart LR
   subgraph GL["🧑 Growth Lead"]
