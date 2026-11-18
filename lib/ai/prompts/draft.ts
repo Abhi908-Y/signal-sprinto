@@ -22,7 +22,7 @@ export type DraftOutput = z.infer<typeof DraftSchema>;
 
 const SHAPE = `{
   "subject": "under 60 characters, lower-case, specific",
-  "body": "the email body, under 150 words, signed off as the Growth Lead",
+  "body": "the email body, under 150 words: opens with the greeting line, ends with the sign-off",
   "hook_quote": "the verbatim sentence from their site that the first line references",
   "hook_url": "the page URL that quote came from"
 }`;
@@ -31,6 +31,11 @@ const PLAY_BRIEF: Record<Play, string> = {
   greenfield: `This company has no compliance certification yet. The angle is getting certified for the first time without it consuming an engineer for three months.`,
   migration: `This company is ALREADY certified. Do not offer to get them certified — that would read as if we had not done our homework. The angle is migration: maintaining and renewing the certification with less manual evidence collection than their current tooling or consultant requires.`,
 };
+
+/** "Deepak Bala" → "Deepak". The prompt only ever greets by first name. */
+function firstName(fullName: string): string {
+  return fullName.trim().split(/\s+/)[0] || fullName;
+}
 
 export function buildDraftPrompt(input: {
   domain: string;
@@ -69,10 +74,11 @@ ${painLines}
 
 Hard constraints:
 - Under 150 words in the body.
-- The FIRST SENTENCE must reference a specific fact about ${input.domain} drawn from the quotes above. Not a compliment, not a generality.
+- Open the body with "Hi ${firstName(input.contactName)}," on its own line. The email is addressed to this person by name.
+- The FIRST SENTENCE after the greeting must reference a specific fact about ${input.domain} drawn from the quotes above. Not a compliment, not a generality.
 - No superlatives. No "I hope this finds you well". No "I wanted to reach out". No "game-changing", "revolutionary", "best-in-class".
 - One clear ask at the end, low commitment.
-- Sign off as the Growth Lead at Sprinto.
+- End with this sign-off on two lines: "Best," then "Growth Lead, Sprinto".
 - Plain text. No markdown, no bullet points.
 
 SOURCES:

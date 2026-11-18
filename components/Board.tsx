@@ -339,7 +339,7 @@ export function Board({ initial, aiAvailable }: { initial: BoardState | null; ai
             />
             <Switch
               label="auto_send"
-              hint="Off: every send needs a click. Signal never emails anyone on its own."
+              hint="On: every Send whose draft passes the evidence check is emailed to the locked inbox as soon as it is written. Off: every send needs a click."
               checked={switches.auto_send}
               onChange={(v) => setSwitches((s) => ({ ...s, auto_send: v }))}
             />

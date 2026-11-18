@@ -8,6 +8,9 @@ import { MAX_EXTRA_FETCHES, emptyFields, shouldContinue } from "@/lib/pipeline/c
 import { chooseNextUrl } from "@/lib/pipeline/loop";
 import { findContacts } from "@/lib/hunter/client";
 import { findCompanySize } from "@/lib/hunter/company";
+import { findCertifiedClaim } from "@/lib/rules/certClaims";
+import { addressDraft, firstNameOf } from "@/lib/pipeline/draftFormat";
+import { deliverDraft } from "@/lib/mail/deliverDraft";
 import { evaluateFit } from "@/lib/rules/fit";
 import { detectSignals, type PageRecord } from "@/lib/rules/signals";
 import { computeVerdict } from "@/lib/rules/verdict";
@@ -302,6 +305,30 @@ export async function runCompany(companyId: string): Promise<RunCompanyResult> {
       iteration += 1;
     }
 
+    /* ⑥a cert_status across every page read. Extraction settles the field page by page, so a
+       security page with no badge could fix it at "none" before a press page saying "Stays
+       SOC 2 Type 2 Compliant" was ever read. A certification claim anywhere outranks that, and
+       routes the company to the migration play (R-04) instead of a first-time-certification
+       pitch it has already outgrown. */
+    if (evidence.cert_status !== "certified") {
+      const claim = findCertifiedClaim(pages);
+      if (claim) {
+        const previous = evidence.cert_status ?? NOT_STATED;
+        evidence = { ...evidence, cert_status: "certified", cert_status_evidence: claim };
+        await q.saveEvidence(companyId, evidence);
+        await q.insertLoopTrace({
+          companyId,
+          iteration,
+          emptyFields: emptyFields(evidence),
+          chosenUrl: claim.url,
+          chosenReason: `cert_status was "${previous}", but a page already read states a SOC 2 / ISO 27001 certification — a claim on any page outranks a page without a badge`,
+          chosenBy: "rules",
+          fetchOk: null,
+          fieldsFilled: ["cert_status"],
+        });
+      }
+    }
+
     /* ⑥b size_band from Hunter, when the site never stated it. Without this R-22 held nearly
        every company, because almost no one publishes a headcount. Asked only when the company
        otherwise clears FIT — a company already dropped is not worth a credit — and before the
@@ -530,14 +557,33 @@ export async function runCompany(companyId: string): Promise<RunCompanyResult> {
         });
       } else {
         const check = validateDraft(draftResult.data, sources);
-        await q.replaceDraft(companyId, {
+        // Addressed by name (the brief's step 6), whatever greeting the model chose.
+        const body = addressDraft(
+          draftResult.data.body,
+          poc.ok ? firstNameOf(poc.selected.first_name) : null,
+        );
+        const draftId = await q.replaceDraft(companyId, {
           subject: draftResult.data.subject,
-          body: draftResult.data.body,
+          body,
           hook_quote: draftResult.data.hook_quote,
           hook_url: check.hook_url,
           validated: check.validated,
           blocked_reason: check.blocked_reason,
         });
+
+        /* ⑪ auto_send — the brief's "writes and sends automatically". Only a Send whose hook
+           passed the evidence check goes out, through the same deliverDraft as the button, to
+           the locked GMAIL_SEND_TO. Off, or out of time, it waits for a click instead. */
+        if (
+          switches.auto_send &&
+          result.verdict === "SEND" &&
+          check.validated &&
+          timeLeftMs(elapsed()) > AI_CALL_RESERVE_MS
+        ) {
+          await q.setStage(companyId, "sending");
+          const draft = await q.getDraftById(draftId);
+          if (draft) await deliverDraft(draft);
+        }
       }
     }
 

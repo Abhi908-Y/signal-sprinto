@@ -90,7 +90,9 @@ export const DEFAULT_SWITCHES: Switches = {
   strict_icp: false,
   ai_enabled: true,
   reader_enabled: true,
-  auto_send: false,
+  // On by default: the brief asks for an email written and sent automatically. Every send still
+  // goes only to the locked GMAIL_SEND_TO inbox, and only for a validated Send.
+  auto_send: true,
 };
 
 export type VerdictResult = {
