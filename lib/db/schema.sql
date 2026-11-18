@@ -202,6 +202,16 @@ CREATE TABLE IF NOT EXISTS ai_cache (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+-- Hunter Company Enrichment cache: the size_band fallback when a site never states its
+-- headcount. "Hunter does not know" is cached too (both columns NULL), so no domain is paid
+-- for twice.
+CREATE TABLE IF NOT EXISTS hunter_company_cache (
+  domain          TEXT PRIMARY KEY,
+  employees_count INTEGER,
+  employees_range TEXT,
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
 -- Hunter Domain Search cache, so repeat domains never cost a second credit (§4.1, T-02).
 CREATE TABLE IF NOT EXISTS hunter_cache (
   domain        TEXT PRIMARY KEY,

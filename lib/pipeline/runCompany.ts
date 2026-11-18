@@ -7,6 +7,7 @@ import { extractWithAi, extractWithRules } from "@/lib/pipeline/extract";
 import { MAX_EXTRA_FETCHES, emptyFields, shouldContinue } from "@/lib/pipeline/completeness";
 import { chooseNextUrl } from "@/lib/pipeline/loop";
 import { findContacts } from "@/lib/hunter/client";
+import { findCompanySize } from "@/lib/hunter/company";
 import { evaluateFit } from "@/lib/rules/fit";
 import { detectSignals, type PageRecord } from "@/lib/rules/signals";
 import { computeVerdict } from "@/lib/rules/verdict";
@@ -299,6 +300,29 @@ export async function runCompany(companyId: string): Promise<RunCompanyResult> {
       });
 
       iteration += 1;
+    }
+
+    /* ⑥b size_band from Hunter, when the site never stated it. Without this R-22 held nearly
+       every company, because almost no one publishes a headcount. Asked only when the company
+       otherwise clears FIT — a company already dropped is not worth a credit — and before the
+       verdict, so a Hunter "500+" drops it under R-02 exactly like a quoted one would. */
+    if (evidence.size_band === null && evaluateFit(evidence, switches).pass) {
+      await q.setStage(companyId, "company size");
+      const size = await findCompanySize(domain);
+      if (size.sizeBand && size.evidence) {
+        evidence = { ...evidence, size_band: size.sizeBand, size_band_evidence: size.evidence };
+        await q.saveEvidence(companyId, evidence);
+      }
+      await q.insertLoopTrace({
+        companyId,
+        iteration,
+        emptyFields: ["size_band"],
+        chosenUrl: null,
+        chosenReason: `size_band was not stated on any page read — ${size.note}`,
+        chosenBy: "hunter",
+        fetchOk: null,
+        fieldsFilled: size.sizeBand ? ["size_band"] : [],
+      });
     }
 
     /* ⑦ rules engine. No model involved from here to the verdict. */

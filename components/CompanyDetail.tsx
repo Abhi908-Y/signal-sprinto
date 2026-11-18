@@ -16,7 +16,7 @@ import {
   Textarea,
 } from "@/components/ui/primitives";
 import { SIGNAL_LABEL } from "@/lib/rules/signals";
-import { NOT_STATED, type EvidenceMap, type SignalId } from "@/lib/types";
+import { NOT_STATED, type Evidence, type EvidenceMap, type SignalId } from "@/lib/types";
 import type {
   ContactDbRow,
   DraftRow,
@@ -200,7 +200,7 @@ function EvidenceFact({
 }: {
   label: string;
   value: string | null;
-  quote: { quote: string; url: string } | null;
+  quote: Evidence | null;
 }) {
   return (
     <div className="rounded-md border border-ink-700 bg-ink-850 px-3 py-2">
@@ -208,10 +208,22 @@ function EvidenceFact({
         <span className="text-[10px] font-semibold uppercase tracking-wide text-ink-400">
           {label}
         </span>
-        {quote ? <QuoteChip url={quote.url} /> : <AiChip />}
+        {quote?.source === "hunter" ? (
+          <a href={quote.url} target="_blank" rel="noreferrer" className="inline-flex" title="From Hunter.io company data, not from the company's own site">
+            <Badge tone="accent">hunter ↗</Badge>
+          </a>
+        ) : quote ? (
+          <QuoteChip url={quote.url} />
+        ) : (
+          <AiChip />
+        )}
       </div>
       <p className="mt-0.5 font-mono text-xs text-ink-100">{value ?? <NotStated />}</p>
-      {quote ? (
+      {quote?.source === "hunter" ? (
+        <p className="mt-1 border-l-2 border-accent/50 pl-2 text-[11px] leading-snug text-ink-300">
+          {quote.quote} — not stated on their own site
+        </p>
+      ) : quote ? (
         <p className="mt-1 border-l-2 border-ink-700 pl-2 text-[11px] leading-snug text-ink-300">
           “{quote.quote}”
         </p>

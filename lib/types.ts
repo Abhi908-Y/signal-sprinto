@@ -5,7 +5,12 @@ export type SizeBand = "1-10" | "11-50" | "51-200" | "201-500" | "500+";
 export type Verdict = "SEND" | "HOLD" | "DROP";
 export type Play = "greenfield" | "migration";
 
-export type Evidence = { quote: string; url: string };
+/**
+ * A claim's proof. By default the quote is verbatim text from `url`, a page we fetched.
+ * `source: "hunter"` marks the one exception — size_band from Hunter.io company data — whose
+ * quote describes Hunter's record instead, and which the UI labels as Hunter, never as a quote.
+ */
+export type Evidence = { quote: string; url: string; source?: "hunter" };
 
 /**
  * The four fields, and only these four, decide whether the loop keeps going (§4.3).
