@@ -1,25 +1,29 @@
 @import "tailwindcss";
 
 @theme {
-  --color-ink-950: #0a0c10;
-  --color-ink-900: #10131a;
-  --color-ink-850: #151924;
-  --color-ink-800: #1b2030;
-  --color-ink-700: #272e42;
-  --color-ink-600: #3a4358;
-  --color-ink-400: #7a849c;
-  --color-ink-300: #9aa3b8;
-  --color-ink-100: #e4e8f0;
+  /* "Paper & teal" light theme. The ink scale keeps its names so every component
+     class still works: 950 is the page, 900 the cards, 100 the main text. */
+  --color-ink-950: #f3efe6; /* page background, warm paper */
+  --color-ink-900: #fffdf9; /* panels and cards */
+  --color-ink-850: #f8f5ee; /* nested items, inputs */
+  --color-ink-800: #eee9de; /* inputs, hover rows */
+  --color-ink-700: #ddd6c7; /* borders */
+  --color-ink-600: #c3baa7; /* strong borders */
+  --color-ink-400: #6b6557; /* muted text */
+  --color-ink-300: #4d483e; /* secondary text */
+  --color-ink-200: #34302a; /* body text in drafts */
+  --color-ink-100: #1d1b16; /* main text */
 
-  --color-accent: #6366f1;
-  --color-accent-soft: #818cf8;
+  --color-accent: #0f6e5f;      /* deep teal */
+  --color-accent-soft: #0b5a4e; /* darker teal: links and button hover */
 
-  --color-send: #22c55e;
-  --color-hold: #f59e0b;
-  --color-drop: #ef4444;
+  --color-send: #157a3a;
+  --color-hold: #9a5306;
+  --color-drop: #b42318;
 
-  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
+  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, "Segoe UI", sans-serif;
+  --font-serif: var(--font-fraunces), Georgia, serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, Consolas, monospace;
 }
 
 html,
@@ -54,4 +58,20 @@ a {
 }
 ::-webkit-scrollbar-track {
   background: transparent;
+}
+
+/* Page titles in the display serif; the company domain h1 stays monospace. */
+h1:not(.font-mono) {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* Cards read as raised paper rather than flat boxes. */
+.bg-ink-900 {
+  box-shadow: 0 1px 2px rgb(29 27 22 / 0.05), 0 1px 1px rgb(29 27 22 / 0.03);
+}
+
+input[type="range"] {
+  accent-color: var(--color-accent);
 }
